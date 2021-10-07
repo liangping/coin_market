@@ -1,21 +1,38 @@
 use lazy_static::lazy_static;
-use serde_json::Value;
+use serde_json::{Value};
 use warp::http::Response;
 use warp::Filter;
 
 use futures::future::join;
-use std::collections::HashMap;
+use std::collections::{BTreeMap};
 use std::sync::Mutex;
 use tokio::time::interval;
 use tokio::time::Duration;
+use once_cell::sync::Lazy;
+use std::fs;
+
+pub static IDS: Lazy<BTreeMap<String, String>> =
+    Lazy::new(|| {
+        let x = fs::read_to_string("pairs.txt").unwrap();
+        let pairs: Vec<&str> = x.split("\n").collect();
+        let mut m = BTreeMap::new();
+        pairs.iter().for_each(|i| {
+            let pair: Vec<&str> = i.split(',').collect();
+            let id = pair.get(0).unwrap();
+            let symbol = pair.get(1).unwrap();
+            m.insert(id.to_string(), symbol.to_uppercase());
+        });
+        m
+    });
+
+
+pub static CURRENCIES: Lazy<Vec<&'static str>> = Lazy::new(|| {
+    vec!["usd", "cny", "eur", "jpy", "krw", "sgd", "hkd"]
+});
 
 lazy_static! {
-    static ref STORE: Mutex<HashMap<String, Value>> = {
-        let m = HashMap::new();
-        Mutex::new(m)
-    };
-    static ref SYMBOLS: Mutex<Vec<&'static str>> = {
-        let m = vec!["ATOM", "IRIS", "LUNA", "BAND", "CRO", "AKT", "KAVA", "OKT"];
+    static ref STORE: Mutex<BTreeMap<String, BTreeMap<String, f32>>> = {
+        let m = BTreeMap::new();
         Mutex::new(m)
     };
 }
@@ -28,33 +45,34 @@ async fn main() {
 }
 
 async fn server() {
-    let token = warp::path!("token" / String).map(|name: String| {
-        let mut symbols = SYMBOLS.lock().unwrap();
-        let s: &'static str = Box::leak(name.into_boxed_str());
-        symbols.push(s);
-        response_text("OK".to_string())
-    });
-    let quote = warp::path!("quote" / String).map(|name| {
+    let quote = warp::path!("quote" / String).map(|name: String| {
         let map = STORE.lock().unwrap();
         // println!("map: {}=> {}", &name, serde_json::to_string().unwrap());
-        match map.get(&name) {
-            Some(q) => response_value(q),
+        match map.get(name.as_str()) {
+            Some(q) => response(format!("{:?}", q)),
             None => response_text("Not found".to_string()),
         }
     });
+    let quotes = warp::path!("quotes").map(|| {
+        let map = STORE.lock().unwrap();
+        response(format!("{:?}", map))
+    });
 
-    warp::serve(token.or(quote)).run(([0, 0, 0, 0], 8000)).await
+    let paths = quote.or(quotes);
+    //paths.or(quotes);
+
+    warp::serve(paths).run(([0, 0, 0, 0], 8000)).await
 }
 
-fn response_text(body: String) -> Response<String> {
+pub fn response_text(body: String) -> Response<String> {
     response(format!("{{\"result\":{:?}}}", body))
 }
 
-fn response_value(body: &Value) -> Response<String> {
+pub fn response_value(body: &Value) -> Response<String> {
     response(format!("{}", body))
 }
 
-fn response(body: String) -> Response<String> {
+pub fn response(body: String) -> Response<String> {
     match Response::builder()
         .header("Access-Control-Expose-Headers", "Content-Length")
         .header("Access-Control-Allow-Origin", "*")
@@ -71,36 +89,67 @@ async fn timer() {
 
     loop {
         interval.tick().await;
-        fetch_coin_market_quotes().await;
+        fetch_coin_gecko_quotes().await;
     }
 }
 
-async fn fetch_coin_market_quotes() {
-    let symbols = SYMBOLS.lock().unwrap();
+async fn fetch_coin_gecko_quotes() {
+    println!("fetch coin gecko quotes");
     let client = reqwest::Client::new();
     let result = client
-        .get("https://pro-api.coinmarketcap.com/v1/cryptocurrency/quotes/latest")
-        .query(&[("symbol", symbols.join(","))])
-        //.query(&[("convert","USD,CNY,EUR,JPY,KRW")]) //plan is not supported
-        .header("X-CMC_PRO_API_KEY", "2a6f96eb-6a10-429a-8a56-9851ed509cf0")
+        .get("https://api.coingecko.com/api/v3/simple/price")
+        .query(&[("ids", IDS.keys().map(|s| &**s).collect::<Vec<_>>().join(","))])
+        .query(&[("vs_currencies", CURRENCIES.join(","))])
+        .query(&[("include_24hr_change", "true")])
         .send()
         .await;
     match result {
         Ok(response) => match response.text().await {
             Ok(text) => {
                 println!("text {}", &text);
-                let json: Value = serde_json::from_str(&text).unwrap();
-                if let Some(quotes) = json.get("data") {
-                    let mut map = STORE.lock().unwrap();
-                    quotes.as_object().iter().for_each(|q_map| {
-                        q_map.iter().for_each(|(k, v)| {
-                            map.insert(k.to_string(), v.clone());
-                        })
-                    })
-                }
+                let json: BTreeMap<String, BTreeMap<String, f32>> = serde_json::from_str(text.to_owned().as_str()).unwrap();
+                // if let Some(quotes) = json.get("data") {
+                let mut map = STORE.lock().unwrap();
+
+                json.keys().for_each(|k| {
+                    if let Some(key) = IDS.get(k) {
+                        map.insert(key.to_string(), json.get(k).unwrap().to_owned());
+                    }
+                })
             }
             Err(e) => println!("error:{}", e.to_string()),
         },
         Err(e) => println!("HTTP ERROR: {}", e.to_string()),
     }
 }
+
+// async fn fetch_coin_market_quotes() {
+//     let symbols = SYMBOLS.lock().unwrap();
+//     let client = reqwest::Client::new();
+//     let result = client
+//         .get("https://pro-api.coinmarketcap.com/v1/cryptocurrency/quotes/latest")
+//         .query(&[("symbol", symbols.join(","))])
+//         //.query(&[("convert","USD,CNY,EUR,JPY,KRW")]) //plan is not supported
+//         .header("X-CMC_PRO_API_KEY", "2a6f96eb-6a10-429a-8a56-9851ed509cf0")
+//         .send()
+//         .await;
+//     match result {
+//         Ok(response) => match response.text().await {
+//             Ok(text) => {
+//                 println!("text {}", &text);
+//                 let json: HashMap<> = serde_json::from_str(&text).unwrap();
+//                 if let Some(quotes) = json.get("data") {
+//                     let mut map = STORE.lock().unwrap();
+//                     let tokens = IDS.lock().unwrap();
+//                     quotes.as_object().iter().for_each(|q_map| {
+//                         q_map.iter().for_each(|(k, v)| {
+//                             map.insert(String::from(k.as_str()), v.clone());
+//                         })
+//                     })
+//                 }
+//             }
+//             Err(e) => println!("error:{}", e.to_string()),
+//         },
+//         Err(e) => println!("HTTP ERROR: {}", e.to_string()),
+//     }
+// }
