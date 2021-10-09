@@ -13,3 +13,5 @@ regen,REGEN
 secret,SCRT
 sentinel,DVPN
 ion,ION
+sifchain,ROWAN
+starname,IOV
