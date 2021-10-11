@@ -1,6 +1,8 @@
 cosmos,ATOM
 iris-network,IRIS
 terra-luna,LUNA
+terrausd,UST
+terra-krw,KRT
 band-protocol,BAND
 crypto-com-chain,CRO
 akash-network,AKT
@@ -15,3 +17,6 @@ sentinel,DVPN
 ion,ION
 sifchain,ROWAN
 starname,IOV
+bitsong,GTSG
+e-money,NGM
+e-money-eur,EEUR
