@@ -17,6 +17,6 @@ sentinel,DVPN
 ion,ION
 sifchain,ROWAN
 starname,IOV
-bitsong,GTSG
+bitsong,BTSG
 e-money,NGM
 e-money-eur,EEUR
