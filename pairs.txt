@@ -20,3 +20,4 @@ starname,IOV
 bitsong,BTSG
 e-money,NGM
 e-money-eur,EEUR
+likecoin,LIKE
