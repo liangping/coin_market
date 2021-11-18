@@ -19,6 +19,7 @@ pub static IDS: Lazy<BTreeMap<String, String>> =
         pairs.iter().for_each(|i| {
             if !i.starts_with("#") {
                 let pair: Vec<&str> = i.trim().split(',').collect();
+                println!("{:?}", pair);
                 let id = pair.get(0).unwrap();
                 let symbol = pair.get(1).unwrap();
                 m.insert(id.to_string(), symbol.to_uppercase());
