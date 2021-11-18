@@ -22,7 +22,7 @@ e-money,NGM
 e-money-eur,EEUR
 likecoin,LIKE
 juno-network,JUNO
-stargaze-protocol,STGZ
+#stargaze-protocol,STGZ
 vidulum,VDL
 ki,XKI
 injective-protocol,INJ

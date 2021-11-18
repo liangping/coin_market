@@ -17,10 +17,12 @@ pub static IDS: Lazy<BTreeMap<String, String>> =
         let pairs: Vec<&str> = x.split("\n").collect();
         let mut m = BTreeMap::new();
         pairs.iter().for_each(|i| {
-            let pair: Vec<&str> = i.split(',').collect();
-            let id = pair.get(0).unwrap();
-            let symbol = pair.get(1).unwrap();
-            m.insert(id.to_string(), symbol.to_uppercase());
+            if !i.starts_with("#") {
+                let pair: Vec<&str> = i.trim().split(',').collect();
+                let id = pair.get(0).unwrap();
+                let symbol = pair.get(1).unwrap();
+                m.insert(id.to_string(), symbol.to_uppercase());
+            }
         });
         m
     });
