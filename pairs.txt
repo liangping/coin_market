@@ -26,3 +26,11 @@ juno-network,JUNO
 vidulum,VDL
 ki,XKI
 injective-protocol,INJ
+stargaze,STARS
+cheqd-network,CHEQ
+chihuahua-token,HUAHUA
+comdex,CMDX
+desmos,DSM
+lum-network,LUM
+microtick,TICK
+bitcanna,BCNA
