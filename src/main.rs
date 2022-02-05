@@ -78,7 +78,8 @@ pub fn response_value(body: &Value) -> Response<String> {
 pub fn response(body: String) -> Response<String> {
     match Response::builder()
         .header("Access-Control-Expose-Headers", "Content-Length")
-        .header("Access-Control-Allow-Origin", "*")
+        //.header("Access-Control-Allow-Origin", "*")
+        .header("Access-Control-Allow-Origin", "https://ping.pub")
         .header("Content-Type", "application/json; charset=utf-8")
         .body(format!("{}", body))
     {
