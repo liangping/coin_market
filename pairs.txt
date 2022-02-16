@@ -34,3 +34,4 @@ desmos,DSM
 lum-network,LUM
 microtick,TICK
 bitcanna,BCNA
+rizon,ATOLO
