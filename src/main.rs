@@ -89,7 +89,7 @@ pub fn response(body: String) -> Response<String> {
 }
 
 async fn timer() {
-    let mut interval = interval(Duration::from_secs(60*60 ));
+    let mut interval = interval(Duration::from_secs(5*60 ));
 
     loop {
         interval.tick().await;
