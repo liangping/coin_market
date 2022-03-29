@@ -36,3 +36,4 @@ microtick,TICK
 bitcanna,BCNA
 rizon,ATOLO
 dig-chain,DIG
+ixo,IXO
