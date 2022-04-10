@@ -37,3 +37,4 @@ bitcanna,BCNA
 rizon,ATOLO
 dig-chain,DIG
 ixo,IXO
+umee,UMEE
