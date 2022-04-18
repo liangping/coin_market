@@ -114,8 +114,9 @@ async fn fetch_coin_gecko_quotes() {
     match result {
         Ok(response) => match response.text().await {
             Ok(text) => {
-                println!("text {}", &text);
-                let json: BTreeMap<String, BTreeMap<String, f32>> = serde_json::from_str(text.to_owned().as_str()).unwrap();
+                let well = text.replace("null", "0");
+                println!("text {}", &well);
+                let json: BTreeMap<String, BTreeMap<String, f32>> = serde_json::from_str(well.to_owned().as_str()).unwrap();
                 // if let Some(quotes) = json.get("data") {
                 let mut map = STORE.lock().unwrap();
 
