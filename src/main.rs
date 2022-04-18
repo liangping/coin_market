@@ -22,7 +22,9 @@ pub static IDS: Lazy<BTreeMap<String, String>> =
                 println!("{:?}", pair);
                 let id = pair.get(0).unwrap();
                 let symbol = pair.get(1).unwrap();
-                m.insert(id.to_string(), symbol.to_uppercase());
+                if id.len() > 1 && symbol.len() > 1 {
+                    m.insert(id.to_string(), symbol.to_uppercase());
+                }
             }
         });
         m
