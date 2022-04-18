@@ -24,7 +24,7 @@ likecoin,LIKE
 juno-network,JUNO
 stargaze-protocol,STGZ
 vidulum,VDL
-#ki,XKI
+ki,XKI
 injective-protocol,INJ
 stargaze,STARS
 cheqd-network,CHEQ
