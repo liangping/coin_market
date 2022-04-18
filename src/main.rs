@@ -117,7 +117,9 @@ async fn fetch_coin_gecko_quotes() {
 
                 json.keys().for_each(|k| {
                     if let Some(key) = IDS.get(k) {
-                        map.insert(key.to_string(), json.get(k).unwrap().to_owned());
+                        if let Some(price) = json.get(k) {
+                            map.insert(key.to_string(), price.to_owned());
+                        }
                     }
                 })
             }
