@@ -20,7 +20,7 @@ pub static IDS: Lazy<BTreeMap<String, String>> =
             if !i.starts_with("#") {
                 let pair: Vec<&str> = i.trim().split(',').collect();
                 println!("{:?}", pair);
-                if(pair.len() >1 ) {
+                if pair.len() >1 {
                     let id = pair.get(0).unwrap();
                     let symbol = pair.get(1).unwrap();
                     if id.len() > 1 && symbol.len() > 1 {
