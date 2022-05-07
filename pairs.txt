@@ -39,3 +39,5 @@ dig-chain,DIG
 ixo,IXO
 umee,UMEE
 graviton,GRAVITON
+crescent-network,CRE
+cerberus-2,CRBRUS
