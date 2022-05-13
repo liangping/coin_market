@@ -41,3 +41,4 @@ umee,UMEE
 graviton,GRAVITON
 crescent-network,CRE
 cerberus-2,CRBRUS
+echelon,ECH
