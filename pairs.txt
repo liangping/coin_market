@@ -43,3 +43,6 @@ crescent-network,CRE
 cerberus-2,CRBRUS
 echelon,ECH
 evmos,EVMOS
+point-network,POINT
+provenance-blockchain,HASH
+fetch-ai,FET
